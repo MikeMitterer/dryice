@@ -1,10 +1,6 @@
-// Copyright (c) 2013, the project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed
-// by a Apache license that can be found in the LICENSE file.
-
 library dice_cmdline_example;
 
-import "package:dice/dice.dart" as di;
+import "package:dryice/dryice.dart" as di;
 
 part "lib/_billing.dart";
 part "lib/_events.dart";

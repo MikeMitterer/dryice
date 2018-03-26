@@ -7,33 +7,33 @@ part of dice_test;
 class MyModule extends Module {
 
   configure() {
-    register(MyClass).toInstance(new MyClass());
-    register(MyOtherClass).toBuilder(() => new MyOtherClass());
-    register(MyClassToInject);
+    bind(MyClass).toInstance(new MyClass());
+    bind(MyOtherClass).toBuilder(() => new MyOtherClass());
+    bind(MyClassToInject);
 
     // Singleton
-    register(MySingletonClass).toType(MySpecialSingletonClass).asSingleton();
+    bind(MySingletonClass).toType(MySpecialSingletonClass).asSingleton();
 
     // named
-    register(MyClass, named: "MySpecialClass").toType(MySpecialClass);
-    register(String, named: "google").toInstance("http://www.google.com/");
+    bind(MyClass, named: "MySpecialClass").toType(MySpecialClass);
+    bind(String, named: "google").toInstance("http://www.google.com/");
 
     // annotated
-    register(String,annotatedWith: UrlGoogle ).toInstance("http://www.google.com/");
-    register(String,annotatedWith: UrlFacebook ).toInstance("http://www.facebook.com/");
+    bind(String,annotatedWith: UrlGoogle ).toInstance("http://www.google.com/");
+    bind(String,annotatedWith: UrlFacebook ).toInstance("http://www.facebook.com/");
   }
 }
 
 class YourModule extends Module {
   configure() {
-    register(YourClass).toType(YourClass);
+      bind(YourClass).toType(YourClass);
   }
 }
 
 class MySingletonModule extends Module {
     configure() {
         // Singleton
-        register(AnotherSingletonClass).asSingleton();
+        bind(AnotherSingletonClass).asSingleton();
     }
 }
 
@@ -43,7 +43,7 @@ class MyModuleForInstallation extends Module {
   configure() {
     install(new MyModule());
 
-    register(MySingletonClass).toType(MySpecialSingletonClass2);
+    bind(MySingletonClass).toType(MySpecialSingletonClass2);
   }
 }
 

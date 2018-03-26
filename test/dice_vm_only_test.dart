@@ -18,8 +18,8 @@ import 'config.dart';
 class MyModule extends Module {
 
     configure() {
-        register(MyFunction).toFunction(MyFunctionToInject);
-        register(MyClassFunction).toFunction(new MyClass().getName);
+        bind(MyFunction).toFunction(MyFunctionToInject);
+        bind(MyClassFunction).toFunction(new MyClass().getName);
     }
 }
 
