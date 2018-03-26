@@ -227,6 +227,21 @@ main() {
             expect(myClass, new isInstanceOf<MyClass>());
             expect(yourClass, new isInstanceOf<YourClass>());
         });
+
+        test('recursion', () {
+            var injector = new Injector();
+            injector
+                ..bind(YourClass)
+                ..bind(MyOtherClass)
+                ..bind(MyClass).toType(ClassLevel2).asSingleton();
+
+            var myClass = injector.getInstance(MyClass);
+
+            expect(myClass, new isInstanceOf<ClassLevel2>());
+
+
+        }); // end of '' test
+
     });
 
     group('internals -', () {

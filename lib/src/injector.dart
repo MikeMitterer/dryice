@@ -187,14 +187,21 @@ class InjectorImpl extends Injector {
     /// create a new instance of classMirror and inject it
     InstanceMirror _newInstance(final ClassMirror classMirror) {
         // Look for an injectable constructor
-        final Iterable<DeclarationMirror> constructors  = injectableConstructors(classMirror).toList();
+        final Iterable<MethodMirror> constructors  = injectableConstructors(classMirror)
+            .map((final DeclarationMirror dm) => dm as MethodMirror);
 
-        // that has the greatest number of parameters to inject, optional included
-        final MethodMirror constructor = constructors.fold(null,
-                (DeclarationMirror previous, DeclarationMirror element) =>
-                    (previous == null
-                        || _injectableParameters(previous).length < _injectableParameters(element).length)
-                            ? element : previous) as MethodMirror;
+        // Take first CTOR by default
+        MethodMirror constructor = constructors.first;
+
+        if(constructors.length > 1) {
+            // that has the greatest number of parameters to inject, optional included
+            constructor = constructors.fold(null,
+                    (DeclarationMirror previous, DeclarationMirror element) =>
+                (previous == null
+                    ||
+                    _injectableParameters(previous).length < _injectableParameters(element).length)
+                    ? element : previous) as MethodMirror;
+        }
 
         final positionalArguments = constructor.parameters
             .where((final ParameterMirror param) => !param.hasDefaultValue && !param.isOptional)
@@ -250,12 +257,13 @@ class InjectorImpl extends Injector {
 
     /** Returns constructors that can be injected */
     Iterable<DeclarationMirror> injectableConstructors(final ClassMirror classMirror) {
-        var constructors = injectableDeclarations(classMirror).where(_isConstructor);
+        Iterable<DeclarationMirror> constructors = injectableDeclarations(classMirror).where(_isConstructor);
         if (constructors.isEmpty) {
             // no explict injectable constructor exists use the default constructor instead
             constructors = classMirror.declarations.values.where((DeclarationMirror m) =>
-            _isConstructor(m) &&
-                (m as MethodMirror).parameters.isEmpty);
+                _isConstructor(m) &&
+                    (m as MethodMirror).parameters.isEmpty);
+
             if (constructors.isEmpty) {
                 throw new StateError("no injectable constructors exists for ${classMirror}");
             }
@@ -263,18 +271,22 @@ class InjectorImpl extends Injector {
         return constructors;
     }
 
+//    /** Returns injectable instance members such as variables, setters, constructors that need injection */
+//    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) {
+//        var declarations = <DeclarationMirror>[];
+//        if (classMirror.superclass != null
+//                && classMirror.superclass.hasReflectedType
+//                    && classMirror.superclass.reflectedType != Object) { // -- has a superclass
+//
+//            declarations.addAll(injectableDeclarations(classMirror.superclass)); // -- recursion
+//        }
+//        return declarations..addAll(classMirror.declarations.values.where(_isInjectable));
+//    }
+
     /** Returns injectable instance members such as variables, setters, constructors that need injection */
-    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) {
-        var declarations = <DeclarationMirror>[];
-        if (classMirror.superclass != null
-                && classMirror.superclass.hasReflectedType
-                    && classMirror.superclass.reflectedType != Object) { // -- has a superclass
-
-            declarations.addAll(injectableDeclarations(classMirror.superclass)); // -- recursion
-        }
-        return declarations..addAll(classMirror.declarations.values.where(_isInjectable));
-    }
-
+    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) =>
+        classMirror.declarations.values.where(_isInjectable);
+    
     /** Returns true if [mirror] is annotated with [Inject] */
     bool _isInjectable(final DeclarationMirror mirror) {
         return mirror.metadata.any((final InstanceMirror im) {

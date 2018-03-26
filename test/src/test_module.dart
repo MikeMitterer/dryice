@@ -127,7 +127,6 @@ class MyClassToInject {
 }
 
 @injectable
-//@Injectable()
 class MyClass {
   String getName() => "MyClass";
 }
@@ -145,6 +144,30 @@ class MySpecialClass implements MyClass {
 @injectable
 class YourClass {
   String getName() => "YourClass";
+}
+
+@injectable
+class ClassLevel1 extends MyClass {
+
+    final MyOtherClass _myoc;
+
+    @override
+    String getName() => "ClassLevel1";
+
+    @inject
+    ClassLevel1(this._myoc);
+}
+
+@injectable
+class ClassLevel2 extends ClassLevel1 {
+    final YourClass _yc1;
+
+    @inject
+    ClassLevel2(this._yc1,final MyOtherClass moc) : super(moc);
+
+    @override
+    String getName() => "ClassLevel2";
+
 }
 
 @injectable

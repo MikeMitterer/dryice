@@ -41,7 +41,7 @@ bool isInjectable(final Type type) {
 }
 
 /// Makes some basic validation checks.
-/// if [codition] is false an [ArgumentError] is thrown
+/// if [condition] is false an [ArgumentError] is thrown
 /// 
 /// [assert] does not work for this because it is always off by default
 /// See: https://github.com/dart-lang/pub/issues/932
