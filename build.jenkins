@@ -1,0 +1,32 @@
+pipeline {
+    agent {
+        label 'linux'
+    }
+    stages {
+        stage('Preparation') {
+            steps {
+                timeout(time: 15, unit: 'MINUTES') {
+                    ansiColor('xterm') {
+                        sh 'pub update'
+                    }
+                }
+            }
+        }
+        stage('Analyze') {
+            steps {
+                ansiColor('xterm') {
+                    sh 'dartanalyzer lib/dryice.dart'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                ansiColor('xterm') {
+                    sh 'pub run test'
+                    sh 'pub run test -p chrome'
+                }
+            }
+        }
+    }
+}
+                       
