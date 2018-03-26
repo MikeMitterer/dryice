@@ -187,14 +187,14 @@ class InjectorImpl extends Injector {
     /// create a new instance of classMirror and inject it
     InstanceMirror _newInstance(final ClassMirror classMirror) {
         // Look for an injectable constructor
-        var constructors = injectableConstructors(classMirror).toList();
+        final Iterable<DeclarationMirror> constructors  = injectableConstructors(classMirror).toList();
 
         // that has the greatest number of parameters to inject, optional included
-        MethodMirror constructor = constructors.fold(null,
-                (MethodMirror previous, DeclarationMirror element) =>
-                    previous == null
-                        || _injectableParameters(previous).length < _injectableParameters(element).length
-                            ? element : previous);
+        final MethodMirror constructor = constructors.fold(null,
+                (DeclarationMirror previous, DeclarationMirror element) =>
+                    (previous == null
+                        || _injectableParameters(previous).length < _injectableParameters(element).length)
+                            ? element : previous) as MethodMirror;
 
         final positionalArguments = constructor.parameters
             .where((final ParameterMirror param) => !param.hasDefaultValue && !param.isOptional)
