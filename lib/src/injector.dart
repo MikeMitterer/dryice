@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed
 // by a Apache license that can be found in the LICENSE file.
 
-part of dice;
+part of dryice;
 
 /// Helper for finding the right annotation
 class _Annotation {
@@ -242,13 +242,16 @@ class InjectorImpl extends Injector {
     }
 
     InstanceMirror _injectVariables(final InstanceMirror instanceMirror) {
-        final Iterable<DeclarationMirror> variables = injectableVariables(instanceMirror.type);
+        final Iterable<VariableMirror> variables = injectableVariables(instanceMirror.type)
+            .map((final DeclarationMirror dm) => dm as VariableMirror);
 
-        variables.forEach((final DeclarationMirror variable) {
+        variables.forEach((final VariableMirror variable) {
             final _Annotation _annotation = new _Annotation.fromMirror(this, variable);
+            _logger.info("Meta ${variable.metadata.join()} / ${_annotation.name} / ${_annotation.type}");
 
-            final instanceToInject = _getInstanceFor((variable as VariableMirror).type,
-                _annotation.name, _annotation.type);
+            _logger.info("V ${variable.qualifiedName} / ${variable.simpleName} / ${variable.reflectedType}");
+            
+            final instanceToInject = _getInstanceFor(variable.type, _annotation.name, _annotation.type);
 
             // set the resolved injection on the instance mirror we are injecting into
             instanceMirror.invokeSetter(variable.simpleName, instanceToInject);
@@ -283,16 +286,8 @@ class InjectorImpl extends Injector {
     }
 
     /** Returns injectable instance members such as variables, setters, constructors that need injection */
-    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) {
-        var declarations = <DeclarationMirror>[];
-//-        if (classMirror.superclass != null
-//                && classMirror.superclass.hasReflectedType
-//                    && classMirror.superclass.reflectedType != Object) { // -- has a superclass
-//
-//            declarations.addAll(injectableDeclarations(classMirror.superclass)); // -- recursion
-//        }
-        return declarations..addAll(classMirror.declarations.values.where(_isInjectable));
-    }
+    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) =>
+        classMirror.declarations.values.where(_isInjectable);
 
     /** Returns true if [mirror] is annotated with [Inject] */
     bool _isInjectable(final DeclarationMirror mirror) {
@@ -310,7 +305,7 @@ class InjectorImpl extends Injector {
     /** Returns true if [declaration] is a setter */
     bool _isSetter(final DeclarationMirror declaration) => declaration is MethodMirror && declaration.isSetter;
 
-    /** Returns name of injection or null if it's unamed */
+    /** Returns name of injection or null if it's unnamed */
     String _injectionName(final DeclarationMirror declaration) {
         var namedMirror = _namedAnnotationOf(declaration);
         if (namedMirror == null) {
@@ -321,10 +316,10 @@ class InjectorImpl extends Injector {
 
     /// Returns the first annotation after @inject or null if it's unannotated
     InstanceMirror _injectionType(final DeclarationMirror declaration) {
-        return declaration.metadata.firstWhere((final Object im) {
+        return declaration.metadata.firstWhere( (final Object im) {
             //print("T ${im.reflectee}");
-            return (im is! InjectAnnotation &&
-                im is! Named);
+            return (im is! InjectAnnotation && im is! Named);
+
         }, orElse: () => null);
     }
 

@@ -4,7 +4,7 @@
 
 library test.resources;
 
-import 'package:dice/dice.dart';
+import 'package:dryice/dryice.dart';
 
 
 class MyModule extends Module {
@@ -22,8 +22,8 @@ class MyModule extends Module {
     register(String, named: "google").toInstance("http://www.google.com/");
 
     // annotated
-    //- register(String,annotatedWith: UrlGoogle ).toInstance("http://www.google.com/");
-    //- register(String,annotatedWith: UrlFacebook ).toInstance("http://www.facebook.com/");
+    register(String,annotatedWith: UrlGoogle ).toInstance("http://www.google.com/");
+    register(String,annotatedWith: UrlFacebook ).toInstance("http://www.facebook.com/");
   }
 }
 

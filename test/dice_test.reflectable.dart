@@ -2,7 +2,7 @@
 // https://github.com/dart-lang/reflectable.
 
 import "dart:core";
-import 'package:dice/dice.dart' as prefix0;
+import 'package:dryice/dryice.dart' as prefix0;
 import 'resources/test_module.dart' as prefix1;
 
 // ignore:unused_import

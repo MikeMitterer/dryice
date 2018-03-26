@@ -4,7 +4,7 @@
 
 library dice_cmdline_example;
 
-import "package:dice/dice.dart" as di;
+import 'package:dryice/dryice.dart' as di;
 
 part "lib/_billing.dart";
 part "lib/_events.dart";

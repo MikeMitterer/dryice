@@ -2,18 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed
 // by a Apache license that can be found in the LICENSE file.
 
-part of dice;
+part of dryice;
 
 final Logger _logger = new Logger('dice._validate');
 
 /// Wrapper for [TypeMirror] to support multiple named registration for the same [Type] */
 class TypeMirrorWrapper {
-//    final TypeMirror _typeMirror;
-//
-//    final String _name;
-//
-//    final TypeMirror _annotationTypeMirror;
-
+    /// Unique name that represents the combination of Type, name annotation where
+    /// name and annotation is optional
     final String qualifiedName;
 
     factory TypeMirrorWrapper(final TypeMirror typeMirror, final String name, final TypeMirror annotationTypeMirror) {
@@ -39,12 +35,14 @@ class TypeMirrorWrapper {
     // private CTOR
     TypeMirrorWrapper._internal(this.qualifiedName);
 
-    static String _createQualifiedName(final String qualifiedName, final String name, final TypeMirror annotationTypeMirror) {
+    static String _createQualifiedName(final String qualifiedName, final String name, final TypeMirror annotationType) {
         return qualifiedName
-            + (name != null ? "#$name" : "")
-            + (annotationTypeMirror != null
-            ? "#${(annotationTypeMirror.qualifiedName)}" : "");
+            + (name != null ? "[N]$name[/N]" : "")
+            + (annotationType != null ? "[A]${(annotationType.qualifiedName)}[/A]" : "");
     }
+
+    @override
+    String toString() => qualifiedName;
 }
 
 // helpers

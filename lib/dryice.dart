@@ -3,7 +3,7 @@
 // by a Apache license that can be found in the LICENSE file.
 
 /** Lightweight dependency injection framework for Dart. */
-library dice;
+library dryice;
 
 //@MirrorsUsed(
 //    metaTargets: const [ Inject, Injectable ],

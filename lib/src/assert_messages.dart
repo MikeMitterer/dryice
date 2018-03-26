@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed
 // by a Apache license that can be found in the LICENSE file.
 
-part of dice;
+part of dryice;
 
 String _ASSERT_REGISTER_TYPE_NOT_MARKED(final Type type)
     => "You are registering '$type' but this type is not marked as '@injectable'";

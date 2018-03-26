@@ -24,7 +24,7 @@ import 'dice_test.reflectable.dart';
 
 import 'package:logging/logging.dart';
 import 'package:test/test.dart';
-import 'package:dice/dice.dart';
+import 'package:dryice/dryice.dart';
 
 import 'resources/test_module.dart';
 
