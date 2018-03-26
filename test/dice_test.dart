@@ -10,7 +10,7 @@ library dice_test;
 import 'dart:mirrors';
 
 import 'package:test/test.dart';
-import 'package:dice/dice.dart';
+import 'package:dryice/dryice.dart';
 
 import 'config.dart';
 part 'src/test_module.dart';
