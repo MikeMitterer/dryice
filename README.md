@@ -328,7 +328,7 @@ yourInjector.register(YourClass).toType(YourClass);
 var injector = new Injector.fromInjectors([myInjector, yourInjector]);
 var myClass = injector.getInstance(MyClass);
 var yourClass = injector.getInstance(YourClass);
-```             `
+```
  
 ## Compatibility / migration from di:package
 
