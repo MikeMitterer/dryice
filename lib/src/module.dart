@@ -81,7 +81,5 @@ class _ModuleContainer extends Module {
         //     module.configure();
         //     return acc..addAll(module._registrations);
         // });
-
     }
-
 }
