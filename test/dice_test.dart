@@ -165,6 +165,18 @@ main() {
             expect(withMixin,isNotNull);
             expect(withMixin, new isInstanceOf<MyStoreClass>());
         });
+
+        test('Multiple binds to same base class', () {
+            final injector = new Injector()
+                ..bind(MyOtherClass)
+                ..bind(MyClass).to(ClassLevel1)
+                ..bind(MyClass).to(MySpecialClass)
+            ;
+            final MyClass mc = injector.getInstance(MyClass);
+            expect(mc, new isInstanceOf<MySpecialClass>());
+
+        }); // end of '' test
+
     });
 
     group('modules - ', () {
