@@ -34,9 +34,9 @@ abstract class Injector {
         var injector = new InjectorImpl();
         injectors.forEach((ijtor) =>
             ijtor.registrations.forEach((typeMirrorWrapper, registration) {
-                if (!injector._registrations.containsKey(typeMirrorWrapper)) {
+                //if (!injector._registrations.containsKey(typeMirrorWrapper)) {
                     injector._registrations[typeMirrorWrapper] = registration;
-                }
+                //}
             })
         );
         return injector;
