@@ -53,15 +53,24 @@ abstract class Module {
 /// Combines several [Module] into single one, allowing to inject
 /// a class from one module into a class from another module.
 class _ModuleContainer extends Module {
+    final List<Module> _modules;
+
     _ModuleContainer(List<Module> this._modules);
 
     @override
     configure() {
-        _modules.fold(_registrations, (acc, module) {
+        _registrations.clear();
+        _modules.forEach((final Module module) {
             module.configure();
-            return acc..addAll(module._registrations);
+            module._registrations.forEach((final TypeMirrorWrapper tm, final Registration registration) {
+                _registrations[tm] = registration;
+            });
         });
-    }
 
-    List<Module> _modules;
+        // Old version (reminder)
+        // _modules.fold(_registrations, (final acc,final Module module) {
+        //     module.configure();
+        //     return acc..addAll(module._registrations);
+        // });
+    }
 }
