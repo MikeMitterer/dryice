@@ -1,5 +1,16 @@
-# DryIce
-Lightweight dependency injection framework for Dart.
+# DryIce (built mirrors / reflectable)
+> Lightweight dependency injection framework for Dart.
+
+## Built mirrors / reflectable
+> This branch is in a very early stage but if you want to try it:
+```dartlang
+git clone -b reflectable git@github.com:MikeMitterer/dryice.git reflectable
+cd reflectable
+pub update
+dart tool/build.dart test/*_test.dart
+pub run test test/dice_test.dart
+pub run test test/dice_test.dart -p chrome
+```` 
 
 ## Getting Started
 DryIce consists of two parts.
