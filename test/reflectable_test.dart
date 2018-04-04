@@ -39,7 +39,7 @@ main() {
     group('Basics', () {
         test('> Make instance', () {
             // Simulate "Registration"
-            final registration = Registration(MyClassToInject);
+            final registration = new Registration(MyClassToInject);
 
             final Type type = registration.builder();
 
@@ -55,7 +55,7 @@ main() {
                 _logger.fine("K $key, D $dm");
             });
 
-            final Object object = classMirror.newInstance("namedCTOR", []);
+            final Object object = classMirror.newInstance("namedCTOR", [ new MyClass() ]);
             expect(object,isNotNull);
 
             expect(object, new isInstanceOf<MyClassToInject>());

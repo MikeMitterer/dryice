@@ -54,16 +54,13 @@ class MyModuleForInstallation extends Module {
 class MyClassToInject {
   // constructors
   @inject
-  MyClassToInject.namedCTOR(/*MyClass constructorParameterToInject*/) {
-    //injections["constructorParameterToInject"] = constructorParameterToInject;
+  MyClassToInject.namedCTOR(MyClass constructorParameterToInject) {
+    injections["constructorParameterToInject"] = constructorParameterToInject;
   }
 
   // setters
   @inject
   set setterToInject(MyClass setterToInject) => injections["setterToInject"] = setterToInject;
-
-  @inject
-  set _setterToInject(MyClass setterToInject) => injections["_setterToInject"] = setterToInject;
 
   set setterNotToInject(MyClass setterNotToInject) => injections["setterNotToInject"] = setterNotToInject;
 
@@ -75,9 +72,6 @@ class MyClassToInject {
   @inject
   MyClass variableToInject;
 
-  @inject
-  MyOtherClass _variableToInject;
-
   MyClass variableNotToInject;
   MyOtherClass _variableNotToInject;
 
@@ -87,7 +81,8 @@ class MyClassToInject {
 
   @inject
   @Named("MySpecialClass")
-  MyClass _namedVariableToInject;
+  // Private - will not be injected
+  MyClass _namedVariableNotToInject;
 
   // Map to trace injections from setters or constructors
   Map injections = new Map();
@@ -106,26 +101,26 @@ class MyClassToInject {
 
   bool assertInjections() {
     // constructors
-    //-var constructorsInjected = (injections[r'constructorParameterToInject'] != null);
+    var constructorsInjected = (injections[r'constructorParameterToInject'] != null);
 
     // variables
-    var variablesToInject = (variableToInject != null && _variableToInject != null);
+    var variablesToInject = (variableToInject != null );
     var variablesNotToInject = (variableNotToInject == null && _variableNotToInject == null);
-    var namedVariablesToInject = (_namedVariableToInject != null && namedVariableToInject != null);
+    var namedVariablesToInject = (_namedVariableNotToInject == null && namedVariableToInject != null);
+
     var variablesInjected = variablesToInject && variablesNotToInject && namedVariablesToInject;
 
     var stringInjectedByName = url1 != null && url1 == "http://www.google.com/";
     var stringInjectedByAnnotation1 = url2 != null && url2 == "http://www.google.com/";
     var stringInjectedByAnnotation2 = url3 != null && url3 == "http://www.facebook.com/";
+    final injectByXXXInjected = (stringInjectedByName && stringInjectedByAnnotation1 && stringInjectedByAnnotation2);
 
     // setters
-    // TODO && injections[r'_setterToInject'] != null
     var settersToInject = (injections[r'setterToInject'] != null);
     var settersNotToInject = (injections[r'setterNotToInject'] == null && injections[r'_setterNotToInject'] == null);
     var settersInjected = settersToInject && settersNotToInject;
 
-    return /*constructorsInjected &&*/ variablesInjected && settersInjected && stringInjectedByName &&
-        stringInjectedByAnnotation1 && stringInjectedByAnnotation2;
+    return constructorsInjected && variablesInjected && settersInjected && injectByXXXInjected;
   }
 }
 
@@ -218,5 +213,19 @@ class UrlGoogle { const UrlGoogle(); }
 class UrlFacebook { const UrlFacebook(); }
 
 class IAmAMixin { }
+
+@inject
 class MyStoreClass extends MyClass with IAmAMixin {}
+
+@inject
+class CTORInjectionWithDefaultParam extends MyClass {
+    final String lang;
+
+    @inject
+    CTORInjectionWithDefaultParam( { final String language: "Java" })
+        : lang = language;
+
+    @override
+    String getName() => "CTORInjectionWithDefaultParam - $lang";
+}
 

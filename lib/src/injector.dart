@@ -9,19 +9,54 @@ class _Annotation {
     final String name;
     final Type type;
 
-    factory _Annotation.fromMirror(final InjectorImpl injector, final VariableMirror variable) {
+    factory _Annotation.fromMirror(final VariableMirror variable) {
 
         // typed-Annotation has priority - if we have one ignore a named-Annotation
-        final InstanceMirror typedAnnotation = injector._injectionType(variable);
-        final Type annotation = typedAnnotation != null ? typedAnnotation.reflectee.runtimeType : null;
+        final Type annotation = _injectionType(variable);
 
         // Only if we have no typed-Annotation
-        final String name = typedAnnotation == null ? injector._injectionName(variable) : null;
+        final String name = annotation == null ? _injectionName(variable) : null;
 
         return new _Annotation._private(name, annotation);
     }
 
     _Annotation._private(this.name, this.type);
+
+    /// Returns the first annotation after @inject or null if it's unannotated
+    static Type _injectionType(final DeclarationMirror declaration) {
+        final Object metadata = declaration.metadata.firstWhere( (final Object im) {
+            //print("T ${im.reflectee}");
+            return (im is! InjectAnnotation && im is! Named);
+
+        }, orElse: () => null);
+
+        if(metadata == null) {
+            return null;
+        }
+        else if(metadata is InstanceMirror) {
+            return metadata.runtimeType;
+        }
+        return metadata.runtimeType;
+    }
+
+    /** Returns name of injection or null if it's unnamed */
+    static String _injectionName(final DeclarationMirror declaration) {
+        var namedMirror = _namedAnnotationOf(declaration);
+        if (namedMirror == null) {
+            return null;
+        }
+        return namedMirror.name;
+    }
+
+    /** Get [Named] annotation for [declaration]. Returns null is non exists */
+    static Named _namedAnnotationOf(DeclarationMirror declaration) {
+        var namedMirror = declaration.metadata.firstWhere((Object im) => im is Named,
+            orElse: () => null);
+        if (namedMirror != null) {
+            return (namedMirror as Named);
+        }
+        return null;
+    }
 }
 
 /// Resolve types to their implementing classes
@@ -102,18 +137,15 @@ class InjectorImpl extends Injector {
     @override
     bool unregister(final Type type, { final String named: null, final Type annotatedWith: null }) {
         
-        return _removeRegistrationFor(inject.reflectType(type), named, annotatedWith != null
-            ? inject.reflectType(type) : null) != null;
+        return _removeRegistrationFor(new TypeMirrorWrapper.fromType(type, named, annotatedWith)) != null;
     }
 
-    bool _hasRegistrationFor(final TypeMirror type, String name, TypeMirror annotation) =>
-        _registrations.containsKey(new TypeMirrorWrapper(type, name, annotation));
+    bool _hasRegistrationFor(final TypeMirrorWrapper tmw) => _registrations.containsKey(tmw);
 
-    Registration _getRegistrationFor(final TypeMirror type, String name, TypeMirror annotation) =>
-        _registrations[new TypeMirrorWrapper(type, name, annotation)];
+    Registration _getRegistrationFor(final TypeMirrorWrapper tmw) => _registrations[tmw];
 
-    Registration _removeRegistrationFor(final TypeMirror type, String name, TypeMirror annotation) {
-        final Registration registration = _registrations.remove(new TypeMirrorWrapper(type, name, annotation));
+    Registration _removeRegistrationFor(final TypeMirrorWrapper tmw) {
+        final Registration registration = _registrations.remove(tmw);
 
         // Remove reference to our instance if there is one
         registration ?._instance = null;
@@ -129,8 +161,8 @@ class InjectorImpl extends Injector {
         _validate(annotatedWith != null ? isInjectable(annotatedWith) : true,
             _ASSERT_GET_ANNOTATION_NOT_MARKED(type,annotatedWith));
 
-        final TypeMirror typeMirror = inject.reflectType(type);
-        return _getInstanceFor(typeMirror, named, annotatedWith);
+        final TypeMirrorWrapper typeMirrorWrapper = new TypeMirrorWrapper.fromType(type, named, annotatedWith);
+        return _getInstanceFor(typeMirrorWrapper);
     }
 
     @override
@@ -142,10 +174,10 @@ class InjectorImpl extends Injector {
     @override
     Map<TypeMirrorWrapper, Registration> get registrations => new UnmodifiableMapView(_registrations);
 
-    dynamic _getInstanceFor(final TypeMirror tm, [ final String named = null, final Type annotatedWith = null ]) {
-        final annotationTypeMirror = annotatedWith != null ? inject.reflectType(annotatedWith) : null;
+    dynamic _getInstanceFor(final TypeMirrorWrapper typeMirrorWrapper) {
+        //final annotationTypeMirror = annotatedWith != null ? inject.reflectType(annotatedWith) : null;
         
-        if (!_hasRegistrationFor(tm, named, annotationTypeMirror)) {
+        if (!_hasRegistrationFor(typeMirrorWrapper)) {
 //            registrations.forEach((final TypeMirrorWrapper wrapper, final Registration registration) {
 //                _logger.info("Registered: ${wrapper.qualifiedName}");
 //            });
@@ -153,12 +185,10 @@ class InjectorImpl extends Injector {
 //            _logger.info("QN: ${wrapper.qualifiedName}");
             
             throw new ArgumentError(
-                "no instance registered for type '${tm.simpleName}', "
-                    "named: $named, "
-                    "annotatedWith: $annotatedWith");
+                "no instance registered for type '${typeMirrorWrapper}'!");
         }
 
-        final registration = _getRegistrationFor(tm, named, annotationTypeMirror);
+        final registration = _getRegistrationFor(typeMirrorWrapper);
 
         // Check if we want a singleton
         if (registration._asSingleton && registration._instance != null) {
@@ -179,8 +209,13 @@ class InjectorImpl extends Injector {
         }
         final InstanceMirror im = (obj is Type) ? _newInstance(inject.reflectType(obj)) : inject.reflect(obj);
 
+        // type is null e.g. @Named("google")
+        if(im.type != null) {
+            _debugType(im);
+        }
+
         //InstanceMirror im = inject.reflect(obj);
-        final instance = _resolveInjections(im);
+        final instance = im.type != null ? _resolveInjections(im) : im.reflectee;
 
         if (registration._asSingleton) {
             // Remember the instance
@@ -189,9 +224,25 @@ class InjectorImpl extends Injector {
         return instance;
     }
 
-    dynamic _resolveInjections(InstanceMirror im) {
-        im = _injectSetters(im);
-        im = _injectVariables(im);
+    void _debugType(final InstanceMirror im) {
+        _logger.info("Type: ${im.type} / RT: ${im.runtimeType} / ${im.type.runtimeType}");
+
+        final Iterable<DeclarationMirror> setters = injectableSetters(im.type);
+        setters.forEach( (final DeclarationMirror setter) {
+            _logger.info("Setter: ${setter.qualifiedName}");
+        });
+
+        final Iterable<DeclarationMirror> variables = injectableVariables(im.type);
+        variables.forEach((final DeclarationMirror variable) {
+            _logger.info("Variable: ${variable.qualifiedName}");
+        });
+    }
+
+    dynamic _resolveInjections(final InstanceMirror im) {
+
+        _injectSetters(im);
+        _injectVariables(im);
+
         return im.reflectee;
     }
 
@@ -210,8 +261,11 @@ class InjectorImpl extends Injector {
         final positionalArguments = constructor.parameters
             .where((final ParameterMirror param) => !param.hasDefaultValue && !param.isOptional)
                 .map((final ParameterMirror param) {
-                    final _Annotation _annotation = new _Annotation.fromMirror(this, param);
-                    return _getInstanceFor(param.type, _annotation.name, _annotation.type);
+
+                    final _Annotation _annotation = new _Annotation.fromMirror(param);
+                    final TypeMirrorWrapper tmw = new TypeMirrorWrapper.fromType(param.reflectedType, _annotation.name, _annotation.type);
+
+                    return _getInstanceFor(tmw);
         }).toList();
 
         final namedArguments = new Map<Symbol, dynamic>();
@@ -220,6 +274,9 @@ class InjectorImpl extends Injector {
                 .forEach((final ParameterMirror param)
                     => namedArguments[new Symbol(param.simpleName)] = param.defaultValue);
 
+        constructor.parameters.forEach((final ParameterMirror pm) {
+            _logger.info(" RT: ${pm.reflectedType}, DV: ${pm.hasDefaultValue}, OPT: ${pm.isOptional}");
+        });
         _logger.info("Type (_newInstance) ${typeMirror}: ${typeMirror.qualifiedName}.${constructor.constructorName}(${positionalArguments},${namedArguments})");
 
         if(typeMirror is! ClassMirror) {
@@ -231,33 +288,32 @@ class InjectorImpl extends Injector {
         return inject.reflect(instance);
     }
 
-    InstanceMirror _injectSetters(final InstanceMirror instanceMirror) {
-        var setters = injectableSetters(instanceMirror.type);
+    void _injectSetters(final InstanceMirror instanceMirror) {
+        final Iterable<DeclarationMirror> setters = injectableSetters(instanceMirror.type);
         setters.forEach((setter) {
             var instanceToInject = _getInstanceFor(_firstParameter(setter));
             // set the resolved injection on the instance mirror we are injecting into
             instanceMirror.invokeSetter(_methodName(setter), instanceToInject);
         });
-        return instanceMirror;
     }
 
-    InstanceMirror _injectVariables(final InstanceMirror instanceMirror) {
+    void _injectVariables(final InstanceMirror instanceMirror) {
         final Iterable<VariableMirror> variables = injectableVariables(instanceMirror.type)
             .map((final DeclarationMirror dm) => dm as VariableMirror);
 
         variables.forEach((final VariableMirror variable) {
-            final _Annotation _annotation = new _Annotation.fromMirror(this, variable);
-            _logger.info("Meta ${variable.metadata.join()} / ${_annotation.name} / ${_annotation.type}");
+            final _Annotation _annotation = new _Annotation.fromMirror(variable);
+            final TypeMirrorWrapper tmw = new TypeMirrorWrapper.fromType(variable.reflectedType,  _annotation.name, _annotation.type);
 
-            _logger.info("V ${variable.qualifiedName} / ${variable.simpleName} / ${variable.reflectedType}");
+            _logger.info("Meta ${variable.metadata.join()} / ${_annotation.name} / ${_annotation.type}");
+            _logger.info("TMW: ${tmw}");
+            _logger.info("V ${variable.qualifiedName} / ${variable.simpleName} / ${variable.reflectedType}\n");
             
-            final instanceToInject = _getInstanceFor(variable.type, _annotation.name, _annotation.type);
+            final instanceToInject = _getInstanceFor(tmw);
 
             // set the resolved injection on the instance mirror we are injecting into
             instanceMirror.invokeSetter(variable.simpleName, instanceToInject);
         });
-
-        return instanceMirror;
     }
 
     /** Returns setters that can be injected */
@@ -286,8 +342,10 @@ class InjectorImpl extends Injector {
     }
 
     /** Returns injectable instance members such as variables, setters, constructors that need injection */
-    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) =>
-        classMirror.declarations.values.where(_isInjectable);
+    Iterable<DeclarationMirror> injectableDeclarations(final ClassMirror classMirror) {
+        return classMirror.declarations.values.where(_isInjectable);
+    }
+
 
     /** Returns true if [mirror] is annotated with [Inject] */
     bool _isInjectable(final DeclarationMirror mirror) {
@@ -305,33 +363,7 @@ class InjectorImpl extends Injector {
     /** Returns true if [declaration] is a setter */
     bool _isSetter(final DeclarationMirror declaration) => declaration is MethodMirror && declaration.isSetter;
 
-    /** Returns name of injection or null if it's unnamed */
-    String _injectionName(final DeclarationMirror declaration) {
-        var namedMirror = _namedAnnotationOf(declaration);
-        if (namedMirror == null) {
-            return null;
-        }
-        return namedMirror.name;
-    }
 
-    /// Returns the first annotation after @inject or null if it's unannotated
-    InstanceMirror _injectionType(final DeclarationMirror declaration) {
-        return declaration.metadata.firstWhere( (final Object im) {
-            //print("T ${im.reflectee}");
-            return (im is! InjectAnnotation && im is! Named);
-
-        }, orElse: () => null);
-    }
-
-    /** Get [Named] annotation for [declaration]. Returns null is non exists */
-    Named _namedAnnotationOf(DeclarationMirror declaration) {
-        var namedMirror = declaration.metadata.firstWhere((Object im) => im is Named,
-            orElse: () => null);
-        if (namedMirror != null) {
-            return (namedMirror as Named);
-        }
-        return null;
-    }
 
     /** Returns method name from [MethodMirror] */
     String _methodName(final MethodMirror method) {
@@ -342,13 +374,12 @@ class InjectorImpl extends Injector {
     }
 
     /** Returns [TypeMirror] for first parameter_methodName(setter) in method */
-    TypeMirror _firstParameter(MethodMirror method) =>
-        method.parameters[0].type;
+    TypeMirrorWrapper _firstParameter(final MethodMirror method) => new TypeMirrorWrapper(method.parameters[0].type, null, null);
 
     /// Returns parameters (including optional) that can be injected
     Iterable<ParameterMirror> _injectableParameters(final MethodMirror method) {
         return method.parameters.where((final ParameterMirror pm) {
-            return _hasRegistrationFor(pm.type, null, null);
+            return _hasRegistrationFor(new TypeMirrorWrapper(pm.type, null, null));
         });
     }
 

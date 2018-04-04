@@ -4,7 +4,7 @@
 
 part of dryice;
 
-final Logger _logger = new Logger('dice._validate');
+final Logger _logger = new Logger('dryice._validate');
 
 /// Wrapper for [TypeMirror] to support multiple named registration for the same [Type] */
 class TypeMirrorWrapper {
@@ -12,17 +12,17 @@ class TypeMirrorWrapper {
     /// name and annotation is optional
     final String qualifiedName;
 
-    factory TypeMirrorWrapper(final TypeMirror typeMirror, final String name, final TypeMirror annotationTypeMirror) {
+    factory TypeMirrorWrapper(final TypeMirror typeMirror, final String named, final TypeMirror annotationTypeMirror) {
         return new TypeMirrorWrapper._internal(
-            TypeMirrorWrapper._createQualifiedName(typeMirror.qualifiedName, name, annotationTypeMirror)
+            TypeMirrorWrapper._createQualifiedName(typeMirror.qualifiedName, named, annotationTypeMirror)
         );
     }
 
-    factory TypeMirrorWrapper.fromType(final Type type, final String name, final Type annotationType) {
+    factory TypeMirrorWrapper.fromType(final Type type, final String named, final Type annotationType) {
         return new TypeMirrorWrapper._internal(
             TypeMirrorWrapper._createQualifiedName(
                 inject.canReflectType(type) ? inject.reflectType(type).qualifiedName : type.toString(),
-                name,
+                named,
                 (annotationType != null ? inject.reflectType(annotationType) : null))
         );
     }
@@ -35,9 +35,9 @@ class TypeMirrorWrapper {
     // private CTOR
     TypeMirrorWrapper._internal(this.qualifiedName);
 
-    static String _createQualifiedName(final String qualifiedName, final String name, final TypeMirror annotationType) {
+    static String _createQualifiedName(final String qualifiedName, final String named, final TypeMirror annotationType) {
         return qualifiedName
-            + (name != null ? "[N]$name[/N]" : "")
+            + (named != null ? "[N]$named[/N]" : "")
             + (annotationType != null ? "[A]${(annotationType.qualifiedName)}[/A]" : "");
     }
 

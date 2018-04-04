@@ -11,18 +11,16 @@ library dice_test;
 
 import 'package:logging/logging.dart';
 
-import 'package:reflectable/reflectable.dart';
-import 'dice_test.reflectable.dart';
-
 import 'package:test/test.dart';
 import 'package:dryice/dryice.dart';
 
 import 'resources/test_module.dart';
 
+import 'dice_test.reflectable.dart';
 import 'config.dart';
 
 main() {
-    configLogging(defaultLogLevel: Level.ALL);
+    configLogging(defaultLogLevel: Level.WARNING);
     initializeReflectable();
     
     group('injector -', () {
@@ -48,6 +46,9 @@ main() {
 
             expect(obj, isNotNull);
             expect(obj, new isInstanceOf<MyClassToInject>());
+
+            expect(obj.assertInjections(),isTrue);
+
         }); // end of 'Simple' test
 
         test('inject singleton', () {
@@ -185,6 +186,15 @@ main() {
             final MyClass withMixin = ctorInjector.getInstance(MyClass);
             expect(withMixin,isNotNull);
             expect(withMixin, new isInstanceOf<MyStoreClass>());
+        });
+
+        test('CTOR injection with default param', () {
+            final ctorInjector = new Injector()
+                ..register(MyClass).toType(CTORInjectionWithDefaultParam)
+            ;
+            final MyClass mc = ctorInjector.getInstance(MyClass);
+            expect(mc,isNotNull);
+            expect(mc.getName(),"CTORInjectionWithDefaultParam - Java");
         });
     });
 
