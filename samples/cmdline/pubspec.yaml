@@ -12,9 +12,11 @@ dependencies:
     path: ../..
     
 dev_dependencies:
-  browser: ^0.10.0
 
   logging_handlers: ^0.8.0
-  console_log_handler: ^0.2.0
+  console_log_handler: ^1.0.0
 
-  test: any
+  build_runner: any
+  build_test: any
+  build_web_compilers: any
+

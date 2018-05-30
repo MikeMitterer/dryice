@@ -8,16 +8,18 @@ environment:
   sdk: '>=1.9.0 <2.0.0'
 
 dependencies:
-  logging: ^0.11.0
+  logging: '>=0.11.3 <1.0.0'
 
-  reflectable:
-    #'^1.0.0'
-    git: git@github.com:dart-lang/reflectable.git
+  reflectable: '^2.0.0'
+    # git: git@github.com:dart-lang/reflectable.git
 
 dev_dependencies:
-  browser: ^0.10.0
+  test: any
 
   logging_handlers: ^0.8.0
-  console_log_handler: ^0.2.0
+  console_log_handler: ^1.0.0
 
-  test: any
+  build_runner: any
+  build_test: any
+  build_web_compilers: any
+
