@@ -18,3 +18,4 @@ packages
 *.js.deps
 *.js.map
 .dart_tool
+*.reflectable.dart
