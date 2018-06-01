@@ -1,47 +1,34 @@
-#### 1.8.0
-* Support Injectable
+# Change Log for dryice
+Lightweight dependency injection framework for Dart.
 
-#### 1.7.0
-* Singleton binding added, Module-installation added
-* Use type annotations
-* Make Named annotations work
-* Add bind method to support
+## [Unreleased](http://github.com/mikemitterer/dryice/compare/v2.0...HEAD)
 
-#### 1.6.5
-* Remove dependency on meta package
+### Feature
+* DryIce is now by default Dart 2.x ready and uses reflectable [98c1ed2](https://github.com/mikemitterer/dryice/commit/98c1ed2701b1dff22f7595e074976ff039d5bd79)
 
-#### 1.6.4
-* Add more tests of named injections
+### Fixes
+* new bind overwrites the previus one (ModuleContainer) [357dcbd](https://github.com/mikemitterer/dryice/commit/357dcbdbe3b03e00713917183c55da4aa44bcccb)
 
-#### 1.6.3
-* Bump versions and improve travis build
-* Update copyright
+### Bugs
+* Remove weird recursive injectableDeclarations-Function [28a92b5](https://github.com/mikemitterer/dryice/commit/28a92b5c5def71879481db0f968450b8f29c0b75)
 
-#### 1.6.2
-* Added change log
+### Test
+* Multi-Bind-Test added [03ec3fc](https://github.com/mikemitterer/dryice/commit/03ec3fc3464e5a7ef5bac1a53fca7707ba275197)
 
-#### 1.6.1
-* Bumped dependencies
-* Switched to Travis build server
-* Run code coverage on test
+## [v2.0](http://github.com/mikemitterer/dryice/compare/v1.8...v2.0) - 2018-05-30
 
-#### 1.6.0
-* Function injection now works
+### Feature
+* Dart 2.x ready [52cb383](https://github.com/mikemitterer/dryice/commit/52cb383656d38dcfc6df68ff272a1f630ad9d6ea)
 
-#### 1.5.4
-* Bump version as pub.dartlang.com failed to update last version
+### Fixes
+* new bind overwrites the previus one (ModuleContainer) [6aedbe8](https://github.com/mikemitterer/dryice/commit/6aedbe82c6eaf9fdda051d36cdf1f51c576abc98)
 
-#### 1.5.3
-* Simplified binding
+### Bugs
+* Expected wrong return type for ClassMirror#newInstance [a7e1476](https://github.com/mikemitterer/dryice/commit/a7e147646d42d982401c98a99ef7eeef77c592ba)
 
-#### 1.5.2
-* More tests
+### Docs
+* Info about Dart 2.x [ce4dd03](https://github.com/mikemitterer/dryice/commit/ce4dd03c921a8b40663f04df27aa0b6ad490d657)
+* HowTo - test with reflectable [ab784e8](https://github.com/mikemitterer/dryice/commit/ab784e82f40efea0fcf4d44122f030d80af0d80c)
 
-#### 1.5.1
-* Updated documentation with new module system
 
-#### 1.5.0
-* New alternative to modules when registering dependencies
-
-#### 1.4.6
-* Document how inject configuration values
+This CHANGELOG.md was generated with [**Changelog for Dart**](https://pub.dartlang.org/packages/changelog)
