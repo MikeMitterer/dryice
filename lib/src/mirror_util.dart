@@ -4,7 +4,7 @@
 
 part of dryice;
 
-final Logger _logger = new Logger('dryice._validate');
+// final Logger _logger = new Logger('dryice._validate');
 
 /// Wrapper for [TypeMirror] to support multiple named registration for the same [Type] */
 class TypeMirrorWrapper {
