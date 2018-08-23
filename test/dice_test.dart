@@ -9,7 +9,7 @@ library dice_test;
 //    symbols: const ['inject', 'Named'])
 //import 'dart:mirrors';
 
-import 'package:logging/logging.dart';
+import 'package:console_log_handler/print_log_handler.dart';
 
 import 'package:test/test.dart';
 import 'package:dryice/dryice.dart';
@@ -17,10 +17,9 @@ import 'package:dryice/dryice.dart';
 import 'resources/test_module.dart';
 
 import 'dice_test.reflectable.dart';
-import 'config.dart';
 
 main() {
-    configLogging(defaultLogLevel: Level.WARNING);
+    configLogging(show: Level.WARNING);
     initializeReflectable();
     
     group('injector -', () {
@@ -34,8 +33,8 @@ main() {
             expect(obj1, isNotNull);
             expect(obj2, isNotNull);
 
-            expect(obj1, new isInstanceOf<MyClass>());
-            expect(obj2, new isInstanceOf<MyClass>());
+            expect(obj1, const TypeMatcher<MyClass>());
+            expect(obj2, const TypeMatcher<MyClass>());
 
             expect(identical(obj1, obj2), isTrue, reason: 'toInstance referes to the same Instance');
 
@@ -45,7 +44,7 @@ main() {
             final MyClassToInject obj = injector.getInstance(MyClassToInject);
 
             expect(obj, isNotNull);
-            expect(obj, new isInstanceOf<MyClassToInject>());
+            expect(obj, const TypeMatcher<MyClassToInject>());
 
             expect(obj.assertInjections(),isTrue);
 
@@ -68,7 +67,7 @@ main() {
         test('getInstance', () {
             var instance = injector.getInstance(MyClassToInject);
             expect(instance, isNotNull);
-            expect(instance, new isInstanceOf<MyClassToInject>());
+            expect(instance, const TypeMatcher<MyClassToInject>());
             expect((instance as MyClassToInject).assertInjections(), isTrue);
         });
 
@@ -137,7 +136,7 @@ main() {
             final MySingletonClass singleton = multiInjector.getInstance(MySingletonClass);
 
             // installed Module overwrites the definition of MySingletonClass
-            expect(singleton, new isInstanceOf<MySpecialSingletonClass2>());
+            expect(singleton, const TypeMatcher<MySpecialSingletonClass2>());
         }); // end of '' test
 
         test('Class injection', () {
@@ -146,7 +145,7 @@ main() {
             metaInjector.register(MyClass).toType(MetaTestClass);
 
             final MyClass mc = metaInjector.getInstance(MyClass);
-            expect(mc, new isInstanceOf<MetaTestClass>());
+            expect(mc, const TypeMatcher<MetaTestClass>());
         });
 
         test('annotatedWith', () {
@@ -185,7 +184,7 @@ main() {
             ;
             final MyClass withMixin = ctorInjector.getInstance(MyClass);
             expect(withMixin,isNotNull);
-            expect(withMixin, new isInstanceOf<MyStoreClass>());
+            expect(withMixin, const TypeMatcher<MyStoreClass>());
         });
 
         test('CTOR injection with default param', () {
@@ -208,8 +207,8 @@ main() {
             var myClass = injector.getInstance(MyClass);
             var yourClass = injector.getInstance(YourClass);
 
-            expect(myClass, new isInstanceOf<MyClass>());
-            expect(yourClass, new isInstanceOf<YourClass>());
+            expect(myClass, const TypeMatcher<MyClass>());
+            expect(yourClass, const TypeMatcher<YourClass>());
         });
 
         test('register runtime', () {
@@ -217,7 +216,7 @@ main() {
             expect(() => injector.getInstance(YourClass), throwsArgumentError);
 
             injector.register(YourClass).toType(YourClass);
-            expect(injector.getInstance(YourClass), new isInstanceOf<YourClass>());
+            expect(injector.getInstance(YourClass), const TypeMatcher<YourClass>());
         });
 
         test('unregister runtime', () {
@@ -231,9 +230,9 @@ main() {
             var yourClass = injector.getInstance(YourClass);
             var myOtherClass = injector.getInstance(MyOtherClass);
 
-            expect(myClass, new isInstanceOf<MySpecialClass>());
-            expect(yourClass, new isInstanceOf<YourClass>());
-            expect(myOtherClass, new isInstanceOf<MyOtherClass>());
+            expect(myClass, const TypeMatcher<MySpecialClass>());
+            expect(yourClass, const TypeMatcher<YourClass>());
+            expect(myOtherClass, const TypeMatcher<MyOtherClass>());
 
             injector.unregister(MyClass);
             injector.unregister(YourClass);
@@ -244,7 +243,7 @@ main() {
             expect(() => injector.getInstance(MyOtherClass), throwsArgumentError);
 
             var myNamedClass = injector.getInstance(MyClass, named: 'test');
-            expect(myNamedClass, new isInstanceOf<MySpecialClass>());
+            expect(myNamedClass,const TypeMatcher<MySpecialClass>());
         });
 
         test('join injectors', () {
@@ -255,8 +254,8 @@ main() {
             var myClass = joinedInjector.getInstance(MyClass);
             var yourClass = joinedInjector.getInstance(YourClass);
 
-            expect(myClass, new isInstanceOf<MyClass>());
-            expect(yourClass, new isInstanceOf<YourClass>());
+            expect(myClass, const TypeMatcher<MyClass>());
+            expect(yourClass, const TypeMatcher<YourClass>());
         });
     });
 
@@ -267,7 +266,7 @@ main() {
         test('new instance of MyClass', () {
             var instance = injector.getInstance(MyClass);
             expect(instance, isNotNull);
-            expect(instance, new isInstanceOf<MyClass>());
+            expect(instance, const TypeMatcher<MyClass>());
         });
 
         test('new instance of MyClassToInject', () {

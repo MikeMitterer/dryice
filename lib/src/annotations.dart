@@ -7,13 +7,13 @@ part of dryice;
 class InjectAnnotation extends Reflectable {
     const InjectAnnotation() : super(
 
-        instanceInvokeCapability,
+        // instanceInvokeCapability,
         invokingCapability,
         reflectedTypeCapability,
         typeCapability,
         typingCapability,
         metadataCapability,
-        newInstanceCapability,
+        // newInstanceCapability,
     );
 }
 

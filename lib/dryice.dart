@@ -5,10 +5,6 @@
 /** Lightweight dependency injection framework for Dart. */
 library dryice;
 
-//@MirrorsUsed(
-//    metaTargets: const [ Inject, Injectable ],
-//    symbols: const ['inject', 'injectable', 'Named'])
-//import 'dart:mirrors';
 import 'dart:collection';
 
 import 'package:reflectable/reflectable.dart';
@@ -22,5 +18,9 @@ part 'src/module.dart';
 part 'src/Registration.dart';
 
 /// Compatibility to JSR-330
+/// https://github.com/google/guice/wiki/JSR330
 const InjectAnnotation inject = const InjectAnnotation();
+
+@deprecated
+const InjectAnnotation injectable = const InjectAnnotation();
 

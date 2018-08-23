@@ -107,7 +107,7 @@ abstract class Injector {
 
 /// Implementation of [Injector].
 class InjectorImpl extends Injector {
-    final Logger _logger = new Logger('dice.InjectorImpl');
+    final Logger _logger = new Logger('dryice.InjectorImpl');
 
     final Map<TypeMirrorWrapper, Registration> _registrations = new Map<TypeMirrorWrapper, Registration>();
 
@@ -198,9 +198,9 @@ class InjectorImpl extends Injector {
 
         final obj = registration._builder();
         if(obj is! Type) {
-            _logger.info("obj.runtimeType: ${obj.runtimeType}");
+            _logger.fine("obj.runtimeType: ${obj.runtimeType}");
         } else {
-            _logger.info("obj.runtimeType: ${obj.runtimeType} obj: ${obj}");
+            _logger.fine("obj.runtimeType: ${obj.runtimeType} obj: ${obj}");
 //            final ClassMirror classMirror = inject.reflectType(obj);
 //            final Object object = classMirror.newInstance("namedCTOR", []);
 //            _logger.info(object);
@@ -225,16 +225,16 @@ class InjectorImpl extends Injector {
     }
 
     void _debugType(final InstanceMirror im) {
-        _logger.info("Type: ${im.type} / RT: ${im.runtimeType} / ${im.type.runtimeType}");
+        _logger.fine("Type: ${im.type} / RT: ${im.runtimeType} / ${im.type.runtimeType}");
 
         final Iterable<DeclarationMirror> setters = injectableSetters(im.type);
         setters.forEach( (final DeclarationMirror setter) {
-            _logger.info("Setter: ${setter.qualifiedName}");
+            _logger.fine("Setter: ${setter.qualifiedName}");
         });
 
         final Iterable<DeclarationMirror> variables = injectableVariables(im.type);
         variables.forEach((final DeclarationMirror variable) {
-            _logger.info("Variable: ${variable.qualifiedName}");
+            _logger.fine("Variable: ${variable.qualifiedName}");
         });
     }
 
@@ -275,9 +275,9 @@ class InjectorImpl extends Injector {
                     => namedArguments[new Symbol(param.simpleName)] = param.defaultValue);
 
         constructor.parameters.forEach((final ParameterMirror pm) {
-            _logger.info(" RT: ${pm.reflectedType}, DV: ${pm.hasDefaultValue}, OPT: ${pm.isOptional}");
+            _logger.fine(" RT: ${pm.reflectedType}, DV: ${pm.hasDefaultValue}, OPT: ${pm.isOptional}");
         });
-        _logger.info("Type (_newInstance) ${typeMirror}: ${typeMirror.qualifiedName}.${constructor.constructorName}(${positionalArguments},${namedArguments})");
+        _logger.fine("Type (_newInstance) ${typeMirror}: ${typeMirror.qualifiedName}.${constructor.constructorName}(${positionalArguments},${namedArguments})");
 
         if(typeMirror is! ClassMirror) {
             throw "${typeMirror.qualifiedName} is not a ClassMirror";
@@ -305,9 +305,9 @@ class InjectorImpl extends Injector {
             final _Annotation _annotation = new _Annotation.fromMirror(variable);
             final TypeMirrorWrapper tmw = new TypeMirrorWrapper.fromType(variable.reflectedType,  _annotation.name, _annotation.type);
 
-            _logger.info("Meta ${variable.metadata.join()} / ${_annotation.name} / ${_annotation.type}");
-            _logger.info("TMW: ${tmw}");
-            _logger.info("V ${variable.qualifiedName} / ${variable.simpleName} / ${variable.reflectedType}\n");
+            _logger.fine("Meta ${variable.metadata.join()} / ${_annotation.name} / ${_annotation.type}");
+            _logger.fine("TMW: ${tmw}");
+            _logger.fine("V ${variable.qualifiedName} / ${variable.simpleName} / ${variable.reflectedType}\n");
             
             final instanceToInject = _getInstanceFor(tmw);
 

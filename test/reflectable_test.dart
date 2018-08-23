@@ -20,20 +20,19 @@
 library dice_test;
 
 import 'package:reflectable/reflectable.dart';
-import 'dice_test.reflectable.dart';
 
-import 'package:logging/logging.dart';
+import 'package:console_log_handler/print_log_handler.dart';
 import 'package:test/test.dart';
 import 'package:dryice/dryice.dart';
 
 import 'resources/test_module.dart';
 
-import 'config.dart';
+import 'dice_test.reflectable.dart';
 
 main() {
     final Logger _logger = new Logger('dice_test.reflectable_test');
 
-    configLogging(defaultLogLevel: Level.ALL);
+    configLogging(show: Level.WARNING);
     initializeReflectable();
 
     group('Basics', () {
@@ -46,7 +45,7 @@ main() {
             final TypeMirror typeMirror = inject.reflectType(type);
             expect(typeMirror,isNotNull);
 
-            expect(typeMirror, new isInstanceOf<ClassMirror>());
+            expect(typeMirror, const TypeMatcher<ClassMirror>());
             final ClassMirror classMirror = typeMirror as ClassMirror;
 
             _logger.fine("runtimeTime: ${type.runtimeType} type: ${type}");
@@ -58,7 +57,7 @@ main() {
             final Object object = classMirror.newInstance("namedCTOR", [ new MyClass() ]);
             expect(object,isNotNull);
 
-            expect(object, new isInstanceOf<MyClassToInject>());
+            expect(object, const TypeMatcher<MyClassToInject>());
         }); // end of 'Make instance' test
 
       test('> Original type', () {
