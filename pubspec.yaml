@@ -1,5 +1,5 @@
 name: dryice
-version: 2.0.17
+version: 2.0.19
 author: Mike Mitterer <office@mikemitterer.at>
 description: Lightweight dependency injection framework for Dart.
 homepage: https://github.com/MikeMitterer/dryice
