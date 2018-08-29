@@ -12,6 +12,9 @@ Lightweight dependency injection framework for Dart.
 ### Bugs
 * Remove weird recursive injectableDeclarations-Function [28a92b5](https://github.com/mikemitterer/dryice/commit/28a92b5c5def71879481db0f968450b8f29c0b75)
 
+### Refactor
+* Removed annotations.dart and moved InjectAnnotation to dryice.dart [633fc45](https://github.com/mikemitterer/dryice/commit/633fc45a878f67c0a163679bde3e17575fa33ca5)
+
 ### Test
 * Removed all references to isInstanceOf, works with latest 'reflectable' version [1ee88c9](https://github.com/mikemitterer/dryice/commit/1ee88c953e37373d636d261afba6a12881c6d0ea)
 * Multi-Bind-Test added [03ec3fc](https://github.com/mikemitterer/dryice/commit/03ec3fc3464e5a7ef5bac1a53fca7707ba275197)
