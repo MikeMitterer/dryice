@@ -4,11 +4,6 @@
 
 library dice_test;
 
-//@MirrorsUsed(
-//    metaTargets: const [ Inject],
-//    symbols: const ['inject', 'Named'])
-//import 'dart:mirrors';
-
 import 'package:console_log_handler/print_log_handler.dart';
 
 import 'package:test/test.dart';

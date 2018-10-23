@@ -5,14 +5,16 @@
 library dice_cmdline_example;
 
 import 'package:dryice/dryice.dart' as di;
+import 'package:dryice_sample_cmdline/cmdline.dart';
 
-part "lib/_billing.dart";
-part "lib/_events.dart";
+import 'main.reflectable.dart';
 
 enum Mode { Production, Development }
 
 main() {
-    final injector = new di.Injector(new ExampleModule(Mode.Production));
+    initializeReflectable();
+    
+    final injector = new di.Injector(new ExampleModule(Mode.Development));
 
     final billingService = injector.getInstance(BillingService);
     

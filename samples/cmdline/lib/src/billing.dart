@@ -2,16 +2,16 @@
 // for details. All rights reserved. Use of this source code is governed
 // by a Apache license that can be found in the LICENSE file.
 
-part of dice_cmdline_example;
+part of cmdline;
 
-@di.inject
+@inject
 class BillingServiceImpl implements BillingService {
 
-  @di.inject
-  CreditProcessor _processor;
+  @inject
+  CreditProcessor processor;
 
   Receipt chargeOrder(Order order, CreditCard creditCard) {
-    if(!(_processor.validate(creditCard))) {
+    if(!(processor.validate(creditCard))) {
       throw new ArgumentError("payment method not accepted");
     }
     // :
@@ -21,17 +21,17 @@ class BillingServiceImpl implements BillingService {
   }
 }
 
-@di.inject
+@inject
 class CreditProcessorImpl implements CreditProcessor {
   bool validate(CreditCard card) => card.type.toUpperCase() == "VISA";
 }
 
-@di.inject
+@inject
 abstract class BillingService {
   Receipt chargeOrder(Order order, CreditCard creditCard);
 }
 
-@di.inject
+@inject
 abstract class CreditProcessor {
   bool validate(CreditCard creditCard);
 }

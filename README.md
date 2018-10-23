@@ -62,13 +62,22 @@ class ExampleModule extends Module {
 ```
 
 **4.** Run it
+
 ```dart
 import "package:dryice/dryice.dart";
+
+// This is the file that gets created
+// if you run 'pub run build_runner build'
+import 'main.reflectable.dart';
+
 main() {
+    initializeReflectable();
+
 	final injector = new Injector(new ExampleModule());
 	final billingService = injector.getInstance(BillingService);
 	final creditCard = new CreditCard("VISA");
 	final order = new Order("Dart: Up and Running");
+	
 	billingService.chargeOrder(order, creditCard);
 }
 ```

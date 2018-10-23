@@ -2,13 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed
 // by a Apache license that can be found in the LICENSE file.
 
-part of dice_cmdline_example;
+part of cmdline;
 
-@di.inject
+@inject
 abstract class Emailer {
     void sendMail();
 }
 
+@inject
 class EmailerToGoogle implements Emailer {
     @override
     void sendMail() {
@@ -16,6 +17,7 @@ class EmailerToGoogle implements Emailer {
     }
 }
 
+@inject
 class EmailerToGMX implements Emailer {
     @override
     void sendMail() {
@@ -23,12 +25,12 @@ class EmailerToGMX implements Emailer {
     }
 }
 
-@di.inject
+@inject
 class EventScheduler {
 
     final Emailer _emailer;
 
-    @di.inject
+    @inject
     EventScheduler(this._emailer);
 
     void send() => _emailer.sendMail();
