@@ -12,6 +12,9 @@ Lightweight dependency injection framework for Dart.
 ### Bugs
 * Remove weird recursive injectableDeclarations-Function [28a92b5](https://github.com/mikemitterer/dryice/commit/28a92b5c5def71879481db0f968450b8f29c0b75)
 
+### Docs
+* Better doc for 'initializeReflectable()' [b962855](https://github.com/mikemitterer/dryice/commit/b96285585ed075556e69b706d57d47dbe425c7a1)
+
 ### Refactor
 * Removed annotations.dart and moved InjectAnnotation to dryice.dart [633fc45](https://github.com/mikemitterer/dryice/commit/633fc45a878f67c0a163679bde3e17575fa33ca5)
 
